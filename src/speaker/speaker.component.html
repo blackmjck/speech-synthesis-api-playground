@@ -1,0 +1,73 @@
+@if (isSupported) {
+<form [formGroup]="form">
+  <mat-card appearance="outlined">
+    @if (isLoading) {
+    <mat-card-content class="centered">
+      <mat-spinner></mat-spinner>
+    </mat-card-content>
+    } @else {
+    <mat-card-header>
+      <mat-card-title>SpeechSynthesis Tester</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <mat-form-field appearance="outline">
+        <mat-label>Text to be read</mat-label>
+        <textarea matInput formControlName="quote"></textarea>
+      </mat-form-field>
+    </mat-card-content>
+
+    <mat-card-actions>
+      <button mat-mini-fab aria-label="Play" (click)="play()">
+        <mat-icon>play_arrow</mat-icon>
+      </button>
+      <button mat-mini-fab aria-label="Stop playing" (click)="stop()">
+        <mat-icon>stop</mat-icon>
+      </button>
+
+      <span></span>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Voice</mat-label>
+        <mat-select formControlName="voice">
+          @for (v of voices; track v) {
+          <mat-option [value]="v">
+            {{ v.name }} ({{ v.lang }}) @if (v.default) { &mdash; DEFAULT }
+          </mat-option>
+          } @empty {
+          <mat-option value="">Default</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </mat-card-actions>
+    }
+  </mat-card>
+
+  @if(form.controls.quote.value) {
+  <mat-card appearance="outlined">
+    <mat-card-header>
+      <mat-card-title>Share link:</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <p>
+        <textarea matInput>{{ shareLink }}</textarea>
+      </p>
+    </mat-card-content>
+  </mat-card>
+  }
+</form>
+} @else {
+<mat-card appearance="outlined">
+  <mat-card-content>
+    <p>
+      Alas, the
+      <a
+        href="https://developer.mozilla.org/en-US/docs/Web/API/SpeechSynthesis"
+        target="_blank"
+        >SpeechSynthesis API</a
+      >
+      is not available in your current browser.
+    </p>
+  </mat-card-content>
+</mat-card>
+}
