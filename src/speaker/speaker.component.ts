@@ -7,11 +7,13 @@ import {
 } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
+import { MatSliderModule } from '@angular/material/slider';
 import { fromEvent } from 'rxjs';
 import { delay } from 'rxjs/operators';
 
@@ -27,11 +29,13 @@ interface Dictionary {
   imports: [
     MatButtonModule,
     MatCardModule,
+    MatExpansionModule,
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
     MatProgressSpinnerModule,
     MatSelectModule,
+    MatSliderModule,
     FormsModule,
     ReactiveFormsModule,
   ],
@@ -43,8 +47,11 @@ export class SpeakerComponent implements OnInit {
     typeof speechSynthesis !== 'undefined' &&
     typeof SpeechSynthesisUtterance !== 'undefined';
   form = new FormGroup({
+    pitch: new FormControl<number>(1), // from 0 to 2 with 1 default
     quote: new FormControl<string>(''),
+    rate: new FormControl<number>(1), // from 0.1 to 10 with 1 default
     voice: new FormControl<SpeechSynthesisVoice | null>(null),
+    volume: new FormControl<number>(1), // from 0 to 1 with 1 default
   });
   voices: any[] = [];
   synth = window.speechSynthesis;
@@ -80,6 +87,10 @@ export class SpeakerComponent implements OnInit {
     }
   }
 
+  formatVolume(value: number): string {
+    return (value * 100) + '%';
+  }
+
   getVoices(): void {
     this.voices = this.synth.getVoices();
   }
@@ -90,18 +101,44 @@ export class SpeakerComponent implements OnInit {
   }
 
   play(): void {
+    const { controls } = this.form;
     const text =
-      this.form.controls.quote.value || 'Please enter some text to be read.';
+      controls.quote.value || 'Please enter some text to be read.';
 
     const phrase = new SpeechSynthesisUtterance(text);
 
-    const voice = this.form.controls.voice.value;
+    const pitch = controls.pitch.value;
+    const rate = controls.rate.value;
+    const voice = controls.voice.value;
+    const volume = controls.volume.value;
 
+    if (pitch) {
+      // round to nearest 0.1
+      phrase.pitch = Math.round(pitch * 10) / 10;
+    }
+    if (rate) { 
+      // round to nearest 0.1
+      phrase.rate = Math.round(rate * 10) / 10;
+    }
     if (voice) {
       phrase.voice = voice;
     }
+    if (volume) {
+      // round to the nearest 0.01
+      phrase.volume = Math.round(volume * 100) / 100;
+    }
+
+    console.log(phrase);
 
     this.synth.speak(phrase);
+  }
+
+  resetOptions(): void {
+    this.form.patchValue({
+      pitch: 1,
+      rate: 1,
+      volume: 1,
+    });
   }
 
   resume(): void {

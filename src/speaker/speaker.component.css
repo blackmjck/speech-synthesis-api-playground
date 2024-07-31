@@ -6,6 +6,10 @@ mat-card-content {
   display: flex;
 }
 
+mat-card-content.column {
+  flex-direction: column;
+}
+
 mat-card-content.centered {
   align-items: center;
   justify-content: center;
@@ -17,6 +21,9 @@ mat-card + mat-card {
 
 mat-card-content mat-form-field {
   flex-grow: 1;
+}
+mat-card-content mat-accordion {
+  flex-basis: 100%;
 }
 
 mat-card-actions {
