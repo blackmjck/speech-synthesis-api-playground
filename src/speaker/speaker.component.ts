@@ -56,6 +56,11 @@ export class SpeakerComponent implements OnInit {
   voices: any[] = [];
   synth = window.speechSynthesis;
 
+  constructor() {
+    // clear out any previous synth backlog
+    window.speechSynthesis.cancel();
+  }
+
   ngOnInit(): void {
     fromEvent(window.speechSynthesis, 'voiceschanged')
       .pipe(delay(1500))
